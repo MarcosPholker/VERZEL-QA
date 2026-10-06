@@ -1,0 +1,593 @@
+{
+  "info": {
+    "_postman_id": "15fbce3f-392e-4c85-8975-f6de83d97f3b",
+    "name": "TESTES",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "11593152",
+    "_collection_link": "https://go.postman.co/collection/11593152-15fbce3f-392e-4c85-8975-f6de83d97f3b?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "01 - Produtos",
+      "item": [
+        {
+          "name": "API-001 - Listar produtos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/produtos",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "produtos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "API-002 - Buscar produto existente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status deve ser 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Resposta deve ser JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test(\"Produto deve possuir os campos obrigatórios\", function () {\r\n    const produto = pm.response.json();\r\n\r\n    pm.expect(produto).to.have.property(\"id\");\r\n    pm.expect(produto).to.have.property(\"nome\");\r\n    pm.expect(produto).to.have.property(\"descricao\");\r\n    pm.expect(produto).to.have.property(\"categoria\");\r\n    pm.expect(produto).to.have.property(\"preco\");\r\n});\r\n\r\npm.test(\"Produto retornado deve ser o P001\", function () {\r\n    const produto = pm.response.json();\r\n\r\n    pm.expect(produto.id).to.eql(\"P001\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/produtos/P001",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "produtos",
+                "P001"
+              ]
+            },
+            "description": "## Buscar produto existente\n\nRetorna os detalhes de um produto específico com base no seu identificador único.\n\n---\n\n### Método e URL\n\n**GET** `/api/produtos/{id}`\n\n---\n\n### Parâmetro de caminho (Path Parameter)\n\n| Parâmetro | Tipo | Obrigatório | Descrição | Exemplo |\n| --- | --- | --- | --- | --- |\n| `id` | string | Sim | Identificador único do produto a ser buscado. | `P001` |\n\n---\n\n### Resposta de sucesso\n\n**Status:** `200 OK`\n\n``` json\n{\n  \"id\": \"P001\",\n  \"nome\": \"Camiseta Essencial\",\n  \"descricao\": \"Algodão penteado e corte reto.\",\n  \"categoria\": \"Vestuário\",\n  \"preco\": 59.9\n}\n\n ```\n\n#### Campos da resposta\n\n| Campo | Tipo | Descrição |\n| --- | --- | --- |\n| `id` | string | Identificador único do produto. |\n| `nome` | string | Nome do produto. |\n| `descricao` | string | Descrição detalhada do produto. |\n| `categoria` | string | Categoria à qual o produto pertence. |\n| `preco` | number | Preço do produto em reais (BRL). |"
+          },
+          "response": []
+        },
+        {
+          "name": "API-003 - Buscar produto inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status deve ser 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});\r\n\r\npm.test(\"Resposta deve ser JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test(\"Deve retornar o código PRODUTO_NAO_ENCONTRADO\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"erro\");\r\n    pm.expect(resposta.erro.codigo).to.eql(\"PRODUTO_NAO_ENCONTRADO\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/produtos/P009",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "produtos",
+                "P009"
+              ]
+            },
+            "description": "## API-003 - Buscar produto inexistente\n\nVerifica o comportamento da API ao tentar buscar um produto que **não existe** no catálogo, confirmando que o sistema retorna o erro adequado.\n\n### Endpoint\n\n`GET /api/produtos/{id}`\n\n### Path Parameters\n\n| Parâmetro | Tipo | Descrição |\n| --- | --- | --- |\n| `id` | string | Identificador único do produto |\n\n> **Nota:** Neste cenário de teste, o ID utilizado (`P009`) corresponde a um produto inexistente. \n  \n\n### Resposta esperada\n\n**Status:** `404 Not Found`\n\n``` json\n{\n  \"erro\": {\n    \"codigo\": \"PRODUTO_NAO_ENCONTRADO\",\n    \"mensagem\": \"Produto P009 não encontrado.\"\n  }\n}\n\n ```\n\n### Critério de aceite\n\n- O status HTTP retornado deve ser `404`.\n    \n- O corpo da resposta deve conter o objeto `erro` com o código `PRODUTO_NAO_ENCONTRADO` e uma mensagem descritiva indicando qual produto não foi encontrado."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Carrinho",
+      "item": [
+        {
+          "name": "API-004 - Calcular carrinho válido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status deve ser 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Resposta deve ser JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test(\"Resposta deve possuir os campos financeiros\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"subtotal\");\r\n    pm.expect(resposta).to.have.property(\"desconto\");\r\n    pm.expect(resposta).to.have.property(\"frete\");\r\n    pm.expect(resposta).to.have.property(\"freteGratis\");\r\n    pm.expect(resposta).to.have.property(\"total\");\r\n});\r\n\r\npm.test(\"Resposta deve possuir informações do cupom\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"cupom\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"itens\": [\r\n    {\r\n      \"produtoId\": \"P002\",\r\n      \"quantidade\": 1\r\n    },\r\n    {\r\n      \"produtoId\": \"P004\",\r\n      \"quantidade\": 2\r\n    }\r\n  ],\r\n  \"cupom\": \"BEMVINDO10\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/carrinho/calcular",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "carrinho",
+                "calcular"
+              ]
+            },
+            "description": "Calcula o resumo de um carrinho de compras válido, aplicando cupom de desconto e calculando frete.\n\n## Endpoint\n\n`POST /api/carrinho/calcular`\n\n## Request Body\n\n| Campo | Tipo | Descrição |\n| --- | --- | --- |\n| `itens` | array | Lista de itens do carrinho |\n| `itens[].produtoId` | string | Identificador único do produto |\n| `itens[].quantidade` | number | Quantidade desejada do produto |\n| `cupom` | string | Código do cupom de desconto (opcional) |\n\n**Exemplo:**\n\n``` json\n{\n  \"itens\": [\n    { \"produtoId\": \"P002\", \"quantidade\": 1 },\n    { \"produtoId\": \"P004\", \"quantidade\": 2 }\n  ],\n  \"cupom\": \"BEMVINDO10\"\n}\n\n ```\n\n## Response `200 OK`\n\n| Campo | Tipo | Descrição |\n| --- | --- | --- |\n| `itens` | array | Lista de itens com detalhes de preço e totais |\n| `subtotal` | number | Soma dos totais dos itens sem desconto |\n| `desconto` | number | Valor total de desconto aplicado |\n| `frete` | number | Valor do frete |\n| `freteGratis` | boolean | Indica se o frete é gratuito |\n| `valorFaltanteFreteGratis` | number | Valor restante para atingir frete grátis |\n| `total` | number | Valor final da compra |\n| `cupom.codigo` | string | Código do cupom informado |\n| `cupom.aplicado` | boolean | Indica se o cupom foi aplicado com sucesso |\n| `cupom.mensagem` | string | Mensagem descritiva sobre o cupom |\n\n## Cenário de Teste\n\nVerifica o cálculo correto de um carrinho com **dois produtos distintos** e **cupom de desconto válido** (`BEMVINDO10` — 10% de desconto). O pedido também deve atingir o limite para **frete grátis**.\n\n**Resultado esperado:**\n\n- Subtotal: R$ 239,70\n    \n- Desconto (10%): R$ 23,97\n    \n- Frete: R$ 0,00 (frete grátis)\n    \n- **Total: R$ 215,73**"
+          },
+          "response": []
+        },
+        {
+          "name": "API-005 - Carrinho sem itens",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status deve ser 422\", function () {\r\n    pm.response.to.have.status(422);\r\n});\r\n\r\npm.test(\"Resposta deve ser JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test(\"Deve retornar o código ITENS_OBRIGATORIOS\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"erro\");\r\n    pm.expect(resposta.erro.codigo).to.eql(\"ITENS_OBRIGATORIOS\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"itens\": []\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/carrinho/calcular",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "carrinho",
+                "calcular"
+              ]
+            },
+            "description": "Valida o comportamento da API ao tentar calcular um carrinho enviando a lista de itens vazia.\n\n**Endpoint:** `POST /api/carrinho/calcular`\n\n**Cenário de teste:** O campo `itens` é enviado no corpo da requisição como um array vazio (`[]`).\n\n**Body da requisição:**\n\n``` json\n{\n  \"itens\": []\n}\n\n ```\n\n**Resultado esperado:** A API deve rejeitar a requisição e retornar o status HTTP `422 Unprocessable Entity`, com a seguinte estrutura de erro:\n\n``` json\n{\n  \"erro\": {\n    \"codigo\": \"ITENS_OBRIGATORIOS\",\n    \"mensagem\": \"Informe ao menos um item.\",\n    \"campo\": \"itens\"\n  }\n}\n\n ```\n\n**Objetivo:** Garantir que a API valida a obrigatoriedade de ao menos um item no carrinho e retorna uma mensagem de erro clara e padronizada."
+          },
+          "response": []
+        },
+        {
+          "name": "API-006 - Produto inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status deve ser 422\", function () {\r\n    pm.response.to.have.status(422);\r\n});\r\n\r\npm.test(\"Resposta deve ser JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test(\"Deve retornar PRODUTO_NAO_ENCONTRADO\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"erro\");\r\n    pm.expect(resposta.erro.codigo).to.eql(\"PRODUTO_NAO_ENCONTRADO\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"itens\": [\r\n    {\r\n      \"produtoId\": \"P999\",\r\n      \"quantidade\": 1\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/carrinho/calcular",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "carrinho",
+                "calcular"
+              ]
+            },
+            "description": "Testa o comportamento da API ao tentar calcular um carrinho contendo um produto inexistente no catálogo.\n\n## Endpoint\n\n`POST /api/carrinho/calcular`\n\n## Objetivo\n\nValidar que a API retorna o erro adequado quando um `produtoId` informado não existe no sistema.\n\n## Request Body\n\n``` json\n{\n  \"itens\": [\n    {\n      \"produtoId\": \"P999\",\n      \"quantidade\": 1\n    }\n  ]\n}\n\n ```\n\n| Campo | Tipo | Descrição |\n| --- | --- | --- |\n| `itens` | array | Lista de itens do carrinho |\n| `itens[].produtoId` | string | ID de um produto inexistente (`P999`) |\n| `itens[].quantidade` | number | Quantidade do produto |\n\n## Resposta Esperada\n\n**Status:** `422 Unprocessable Entity`\n\n``` json\n{\n  \"erro\": {\n    \"codigo\": \"PRODUTO_NAO_ENCONTRADO\",\n    \"mensagem\": \"Produto P999 não encontrado.\",\n    \"campo\": \"itens[0].produtoId\"\n  }\n}\n\n ```\n\n| Campo | Tipo | Descrição |\n| --- | --- | --- |\n| `erro.codigo` | string | Código de erro: `PRODUTO_NAO_ENCONTRADO` |\n| `erro.mensagem` | string | Mensagem descritiva do erro |\n| `erro.campo` | string | Campo que originou o erro |\n\n## Critérios de Aceite\n\n- Status HTTP deve ser `422`\n    \n- Resposta deve estar em formato JSON\n    \n- O campo `erro.codigo` deve conter `PRODUTO_NAO_ENCONTRADO`"
+          },
+          "response": []
+        },
+        {
+          "name": "API-007 — Produto duplicado no carrinho",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status deve ser 422\", function () {\r\n    pm.response.to.have.status(422);\r\n});\r\n\r\npm.test(\"Resposta deve ser JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test(\"Deve retornar erro de produto duplicado\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"erro\");\r\n    pm.expect(resposta.erro).to.have.property(\"codigo\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"itens\": [\r\n    {\r\n      \"produtoId\": \"P002\",\r\n      \"quantidade\": 1\r\n    },\r\n    {\r\n      \"produtoId\": \"P002\",\r\n      \"quantidade\": 2\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/carrinho/calcular",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "carrinho",
+                "calcular"
+              ]
+            },
+            "description": "Verifica o comportamento da API de cálculo de carrinho ao enviar o **mesmo produto duplicado** na lista de itens da requisição.\n\n**Endpoint:** `POST /api/carrinho/calcular`\n\n## Cenário\n\nO corpo da requisição contém dois itens com o mesmo `produtoId` (`P002`), com quantidades distintas (1 e 2), simulando um envio inválido de carrinho com produto repetido.\n\n## Body\n\n``` json\n{\n  \"itens\": [\n    { \"produtoId\": \"P002\", \"quantidade\": 1 },\n    { \"produtoId\": \"P002\", \"quantidade\": 2 }\n  ]\n}\n\n ```\n\n## Resultado esperado\n\n| Campo | Valor esperado |\n| --- | --- |\n| HTTP Status | `422 Unprocessable Entity` |\n| Content-Type | `application/json` |\n| `erro.codigo` | `PRODUTO_NAO_ENCONTRADO` |\n\n## Validações automatizadas\n\n- Status deve ser `422`\n    \n- Resposta deve ser JSON\n    \n- Campo `erro.codigo` deve ser `PRODUTO_NAO_ENCONTRADO`"
+          },
+          "response": []
+        },
+        {
+          "name": "API-008 - Quantidade zero",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status deve ser 422\", function () {\r\n    pm.response.to.have.status(422);\r\n});\r\n\r\npm.test(\"Resposta deve ser JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test(\"Deve retornar erro de quantidade inválida\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"erro\");\r\n    pm.expect(resposta.erro).to.have.property(\"codigo\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"itens\": [\r\n    {\r\n      \"produtoId\": \"P002\",\r\n      \"quantidade\": 0\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/carrinho/calcular",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "carrinho",
+                "calcular"
+              ]
+            },
+            "description": "## Descrição\n\nVerifica que a API retorna um erro de validação ao tentar calcular um carrinho com um produto cuja quantidade é igual a zero.\n\n## Endpoint\n\n`POST /api/carrinho/calcular`\n\n## Corpo da Requisição\n\n``` json\n{\n  \"itens\": [\n    {\n      \"produtoId\": \"P002\",\n      \"quantidade\": 0\n    }\n  ]\n}\n\n ```\n\n## Comportamento Esperado\n\n- **Status HTTP:** `422 Unprocessable Entity`\n    \n- **Código de erro:** `QUANTIDADE_INVALIDA`\n    \n- **Campo inválido:** `itens[0].quantidade`\n    \n- **Mensagem:** `A quantidade deve ser um número inteiro maior ou igual a 1.`\n    \n\n## Objetivo do Teste\n\nGarantir que a API rejeita corretamente quantidades iguais a zero, retornando uma resposta de erro estruturada que identifica o campo problemático e orienta o consumidor sobre o valor mínimo aceito."
+          },
+          "response": []
+        },
+        {
+          "name": "API-009 — Quantidade máxima",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status deve ser 422\", function () {\r\n    pm.response.to.have.status(422);\r\n});\r\n\r\npm.test(\"Resposta deve ser JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test(\"Deve retornar QUANTIDADE_MAXIMA_EXCEDIDA\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"erro\");\r\n    pm.expect(resposta.erro.codigo).to.eql(\"QUANTIDADE_MAXIMA_EXCEDIDA\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"itens\": [\r\n    {\r\n      \"produtoId\": \"P002\",\r\n      \"quantidade\": 6\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/carrinho/calcular",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "carrinho",
+                "calcular"
+              ]
+            },
+            "description": "## Descrição\n\nValida o comportamento da API ao receber um item com **quantidade acima do máximo permitido** no cálculo do carrinho.\n\nEste é um teste **negativo**: o sistema deve rejeitar a requisição e retornar um erro de validação (`422 Unprocessable Entity`), impedindo que o carrinho seja calculado com uma quantidade inválida.\n\n---\n\n## Endpoint\n\n`POST /api/carrinho/calcular`\n\n---\n\n## Corpo da Requisição\n\n``` json\n{\n  \"itens\": [\n    {\n      \"produtoId\": \"P002\",\n      \"quantidade\": 6\n    }\n  ]\n}\n\n ```\n\n| Campo | Tipo | Descrição |\n| --- | --- | --- |\n| `itens` | array | Lista de itens do carrinho |\n| `itens[].produtoId` | string | Identificador do produto |\n| `itens[].quantidade` | integer | Quantidade solicitada (acima do limite permitido) |\n\n---\n\n## Resposta Esperada\n\n**Status:** `422 Unprocessable Entity`\n\n``` json\n{\n  \"erro\": {\n    \"codigo\": \"<código do erro>\"\n  }\n}\n\n ```\n\n| Campo | Tipo | Descrição |\n| --- | --- | --- |\n| `erro` | object | Objeto de erro retornado pela API |\n| `erro.codigo` | string | Código identificador do erro de validação |\n\n---\n\n## Critérios de Aceite\n\n| # | Asserção | Resultado Esperado |\n| --- | --- | --- |\n| 1 | Status deve ser 422 | A API retorna HTTP 422 |\n| 2 | Resposta deve ser JSON | O corpo da resposta é um JSON válido |\n| 3 | Deve retornar erro de quantidade acima do permitido | A resposta contém `erro.codigo` |\n\n---\n\n## Observações\n\n- O produto `P002` (Calça Jeans Slim) possui um limite máximo de quantidade por pedido. Enviar `quantidade: 6` deve ultrapassar esse limite.\n    \n- Em caso de falha, verifique se a regra de negócio de quantidade máxima está implementada no backend."
+          },
+          "response": []
+        },
+        {
+          "name": "API-010 — Aplicar cupom válido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status deve ser 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Resposta deve ser JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test(\"Resposta deve possuir os campos do cálculo\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"subtotal\");\r\n    pm.expect(resposta).to.have.property(\"desconto\");\r\n    pm.expect(resposta).to.have.property(\"frete\");\r\n    pm.expect(resposta).to.have.property(\"total\");\r\n});\r\n\r\npm.test(\"Deve retornar informações do cupom\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"cupom\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"itens\": [\r\n    {\r\n      \"produtoId\": \"P002\",\r\n      \"quantidade\": 1\r\n    }\r\n  ],\r\n  \"cupom\": \"BEMVINDO10\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/carrinho/calcular",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "carrinho",
+                "calcular"
+              ]
+            },
+            "description": "StartFragment\n\n# API-010 — Cupom válido\n\n## Objetivo\n\nValidar o comportamento da API ao calcular um carrinho válido utilizando um cupom de desconto válido.\n\nEste é um **teste positivo**, no qual a requisição deve ser processada com sucesso e o desconto correspondente ao cupom deve ser considerado no cálculo do carrinho.\n\n## Endpoint\n\n`POST /api/carrinho/calcular`\n\n## Corpo da Requisição\n\n```\n{\n  \"itens\": [\n    {\n      \"produtoId\": \"P002\",\n      \"quantidade\": 1\n    }\n  ],\n  \"cupom\": \"BEMVINDO10\"\n}\n\n ```\n\n## Resultado Esperado\n\n**Status:** `200 OK`\n\nA API deve retornar uma resposta em formato JSON contendo as informações do cálculo do carrinho, incluindo:\n\n- subtotal;\n    \n- desconto;\n    \n- frete;\n    \n- total;\n    \n- informações referentes ao cupom utilizado.\n    \n\nO desconto deve ser aplicado de acordo com a regra definida para o cupom `BEMVINDO10`.\n\n## Critérios de Aceite\n\n| # | Asserção | Resultado Esperado |\n| --- | --- | --- |\n| 1 | Status deve ser 200 | A API retorna HTTP `200` |\n| 2 | Resposta deve ser JSON | O corpo da resposta possui formato JSON válido |\n| 3 | Deve possuir informações do cálculo | A resposta contém subtotal, desconto, frete e total |\n| 4 | Deve retornar informações do cupom | A resposta contém o campo `cupom` |\n\n## Conclusão\n\nO teste será considerado aprovado quando a API aceitar o carrinho com o cupom válido e retornar corretamente os valores calculados.\n\nEndFragment"
+          },
+          "response": []
+        },
+        {
+          "name": "API-011 — Criar pedido válido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status deve ser 201\", function () {\r\n    pm.response.to.have.status(201);\r\n});\r\n\r\npm.test(\"Resposta deve ser JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test(\"Pedido deve possuir número\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"numero\");\r\n    pm.expect(resposta.numero).to.match(/^VZ-\\d{6}$/);\r\n});\r\n\r\npm.test(\"Pedido deve possuir os campos principais\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"criadoEm\");\r\n    pm.expect(resposta).to.have.property(\"cliente\");\r\n    pm.expect(resposta).to.have.property(\"itens\");\r\n    pm.expect(resposta).to.have.property(\"subtotal\");\r\n    pm.expect(resposta).to.have.property(\"desconto\");\r\n    pm.expect(resposta).to.have.property(\"frete\");\r\n    pm.expect(resposta).to.have.property(\"total\");\r\n    pm.expect(resposta).to.have.property(\"cupom\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cliente\": {\r\n    \"nome\": \"Maria Silva\",\r\n    \"email\": \"maria@exemplo.com\",\r\n    \"cep\": \"01310-100\"\r\n  },\r\n  \"itens\": [\r\n    {\r\n      \"produtoId\": \"P005\",\r\n      \"quantidade\": 1\r\n    }\r\n  ],\r\n  \"cupom\": \"BEMVINDO10\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/pedidos",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "StartFragment\n\n# API-011 — Criar pedido válido\n\n## Objetivo\n\nValidar a criação de um pedido utilizando dados válidos do cliente, produto existente e cupom válido.\n\nEste é um **teste positivo**. A API deve validar os dados, confirmar o pedido e retornar `201 Created`.\n\n---\n\n## Endpoint\n\n`POST /api/pedidos`\n\n---\n\n## Corpo da Requisição\n\n```\n{\n  \"cliente\": {\n    \"nome\": \"Maria Silva\",\n    \"email\": \"maria@exemplo.com\",\n    \"cep\": \"01310-100\"\n  },\n  \"itens\": [\n    {\n      \"produtoId\": \"P005\",\n      \"quantidade\": 1\n    }\n  ],\n  \"cupom\": \"BEMVINDO10\"\n}\n\n ```\n\n### Dados utilizados\n\n| Campo | Valor | Motivo |\n| --- | --- | --- |\n| `cliente.nome` | `Maria Silva` | Nome e sobrenome válidos |\n| `cliente.email` | `maria@exemplo.com` | Formato de e-mail válido |\n| `cliente.cep` | `01310-100` | CEP válido com 8 dígitos |\n| `produtoId` | `P005` | Produto existente |\n| `quantidade` | `1` | Quantidade válida |\n| `cupom` | `BEMVINDO10` | Cupom válido |\n\n---\n\n## Resposta Esperada\n\n**Status:** `201 Created`\n\nA API deve retornar o número do pedido no formato `VZ-000000` e o resumo dos valores calculados.\n\nExemplo:\n\n```\n{\n  \"numero\": \"VZ-482913\",\n  \"criadoEm\": \"2026-09-30T14:22:05.120Z\",\n  \"cliente\": {\n    \"nome\": \"Maria Silva\",\n    \"email\": \"maria@exemplo.com\",\n    \"cep\": \"01310100\"\n  },\n  \"itens\": [],\n  \"subtotal\": 100,\n  \"desconto\": 10,\n  \"frete\": 19.9,\n  \"freteGratis\": false,\n  \"valorFaltanteFreteGratis\": 100,\n  \"total\": 109.9,\n  \"cupom\": {\n    \"codigo\": \"BEMVINDO10\",\n    \"aplicado\": true\n  }\n}\n\n ```\n\n---\n\n## Critérios de Aceite\n\n| # | Asserção | Resultado Esperado |\n| --- | --- | --- |\n| 1 | Status deve ser 201 | A API retorna HTTP `201 Created` |\n| 2 | Resposta deve ser JSON | O corpo da resposta possui formato JSON válido |\n| 3 | Pedido deve possuir número | O campo `numero` segue o formato `VZ-000000` |\n| 4 | Pedido deve possuir dados principais | A resposta contém cliente, itens e valores calculados |\n| 5 | Cupom deve ser aplicado | O cupom `BEMVINDO10` aparece como aplicado |\n\n---\n\n## Conclusão\n\nO teste será considerado aprovado quando a API aceitar os dados válidos, criar o pedido e retornar `201 Created` com o número do pedido e o resumo correto do cálculo.\n\nEndFragment"
+          },
+          "response": []
+        },
+        {
+          "name": "API-012 — Dados inválidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status deve ser 422\", function () {\r\n    pm.response.to.have.status(422);\r\n});\r\n\r\npm.test(\"Resposta deve ser JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test(\"Deve retornar erro de dados inválidos\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"erro\");\r\n    pm.expect(resposta.erro.codigo).to.eql(\"DADOS_INVALIDOS\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cliente\": {\r\n    \"nome\": \"Maria\",\r\n    \"email\": \"maria@exemplo.com\",\r\n    \"cep\": \"01310-100\"\r\n  },\r\n  \"itens\": [\r\n    {\r\n      \"produtoId\": \"P005\",\r\n      \"quantidade\": 1\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/pedidos",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "StartFragment\n\n# API-012 — Dados inválidos\n\n## Objetivo\n\nValidar se a API rejeita a criação de um pedido quando os dados do cliente são inválidos.\n\nNeste cenário, foi utilizado um nome sem sobrenome, contrariando a regra da documentação que exige nome e sobrenome.\n\n## Endpoint\n\n**POST** `/api/pedidos`\n\n## Dados enviados\n\n```\n{\n  \"cliente\": {\n    \"nome\": \"Maria\",\n    \"email\": \"maria@exemplo.com\",\n    \"cep\": \"01310-100\"\n  },\n  \"itens\": [\n    {\n      \"produtoId\": \"P005\",\n      \"quantidade\": 1\n    }\n  ]\n}\n\n ```\n\n## Regra validada\n\nO campo `cliente.nome` deve conter nome e sobrenome.\n\nO valor `\"Maria\"` é considerado inválido por não possuir sobrenome.\n\n## Resultado esperado\n\nA API deve rejeitar o pedido e retornar:\n\n- **HTTP 422 — Unprocessable Entity**\n    \n- Código do erro: `DADOS_INVALIDOS`\n    \n- Resposta em formato JSON\n    \n\n## Resultado obtido\n\nO comportamento esperado foi confirmado:\n\n| Validação | Resultado |\n| --- | --- |\n| Status HTTP `422` | ✅ Passou |\n| Resposta em JSON | ✅ Passou |\n| Código `DADOS_INVALIDOS` | ✅ Passou |\n\n## Conclusão\n\n**Teste aprovado.**\n\nA API identificou corretamente que os dados do cliente eram inválidos e impediu a criação do pedido.\n\n**Status: PASS**"
+          },
+          "response": []
+        },
+        {
+          "name": "API-013 — Produto inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status deve ser 422\", function () {\r\n    pm.response.to.have.status(422);\r\n});\r\n\r\npm.test(\"Resposta deve ser JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test(\"Deve retornar produto não encontrado\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"erro\");\r\n    pm.expect(resposta.erro.codigo).to.eql(\"PRODUTO_NAO_ENCONTRADO\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cliente\": {\r\n    \"nome\": \"Maria Silva\",\r\n    \"email\": \"maria@exemplo.com\",\r\n    \"cep\": \"01310-100\"\r\n  },\r\n  \"itens\": [\r\n    {\r\n      \"produtoId\": \"P999\",\r\n      \"quantidade\": 1\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/pedidos",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "StartFragment\n\n# API-013 — Produto inexistente\n\n## Objetivo\n\nValidar se a API rejeita a criação de um pedido quando o produto informado não existe no catálogo.\n\n## Endpoint\n\n**POST** `/api/pedidos`\n\n## Dados enviados\n\n```\n{\n  \"cliente\": {\n    \"nome\": \"Maria Silva\",\n    \"email\": \"maria@exemplo.com\",\n    \"cep\": \"01310-100\"\n  },\n  \"itens\": [\n    {\n      \"produtoId\": \"P999\",\n      \"quantidade\": 1\n    }\n  ]\n}\n\n ```\n\nO produto `P999` foi utilizado por não existir no catálogo de produtos.\n\n## Regra validada\n\nA API não deve permitir a criação de um pedido contendo um produto inexistente.\n\nDe acordo com a documentação, deve retornar o código de erro `PRODUTO_NAO_ENCONTRADO`.\n\n## Resultado esperado\n\n- **HTTP 422 — Unprocessable Entity**\n    \n- Resposta em formato JSON\n    \n- Código do erro: `PRODUTO_NAO_ENCONTRADO`\n    \n\n## Resultado obtido\n\n| Validação | Resultado |\n| --- | --- |\n| Status HTTP `422` | ✅ Passou |\n| Resposta em JSON | ✅ Passou |\n| Código `PRODUTO_NAO_ENCONTRADO` | ✅ Passou |\n\n## Conclusão\n\n**Teste aprovado.**\n\nA API identificou corretamente que o produto informado não existe e impediu a criação do pedido.\n\n**Status: PASS**\n\nEndFragment"
+          },
+          "response": []
+        },
+        {
+          "name": "API-014 — Cupom inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status deve ser 422\", function () {\r\n    pm.response.to.have.status(422);\r\n});\r\n\r\npm.test(\"Resposta deve ser JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test(\"Deve retornar cupom inválido\", function () {\r\n    const resposta = pm.response.json();\r\n\r\n    pm.expect(resposta).to.have.property(\"erro\");\r\n    pm.expect(resposta.erro.codigo).to.eql(\"CUPOM_INVALIDO\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cliente\": {\r\n    \"nome\": \"Maria Silva\",\r\n    \"email\": \"maria@exemplo.com\",\r\n    \"cep\": \"01310-100\"\r\n  },\r\n  \"itens\": [\r\n    {\r\n      \"produtoId\": \"P005\",\r\n      \"quantidade\": 1\r\n    }\r\n  ],\r\n  \"cupom\": \"CUPOM999\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://verzel-store.qa-test-verzel-store.workers.dev/api/pedidos",
+              "protocol": "https",
+              "host": [
+                "verzel-store",
+                "qa-test-verzel-store",
+                "workers",
+                "dev"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "StartFragment\n\n# API-014 — Cupom inválido\n\n## Objetivo\n\nValidar se a API rejeita a criação de um pedido quando é informado um cupom de desconto inexistente.\n\n## Endpoint\n\n**POST** `/api/pedidos`\n\n## Dados enviados\n\n```\n{\n  \"cliente\": {\n    \"nome\": \"Maria Silva\",\n    \"email\": \"maria@exemplo.com\",\n    \"cep\": \"01310-100\"\n  },\n  \"itens\": [\n    {\n      \"produtoId\": \"P005\",\n      \"quantidade\": 1\n    }\n  ],\n  \"cupom\": \"CUPOM999\"\n}\n\n ```\n\nO cupom `CUPOM999` foi utilizado por não existir entre os cupons disponíveis.\n\n## Regra validada\n\nA API não deve permitir a criação de um pedido com um cupom\n\nEndFragment"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
